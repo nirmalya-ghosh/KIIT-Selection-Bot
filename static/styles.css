@@ -50,7 +50,7 @@ body {
 }
 
 .dashboard-layout {
-    max-width: 700px;
+    max-width: 800px;
     padding: 30px;
 }
 
@@ -137,19 +137,22 @@ p { color: var(--text-muted); font-size: 14px; }
     background: var(--card-hover);
     border: 1px solid var(--border);
     border-radius: 8px;
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
+    min-width: 500px; /* Forces scroll on small screens instead of squishing */
 }
 
 th, td {
     padding: 12px 16px;
     text-align: left;
     border-bottom: 1px solid var(--border);
+    white-space: nowrap;
 }
 
 th { font-weight: 500; color: var(--text-muted); }
@@ -175,6 +178,18 @@ input, select {
     font-size: 14px;
     outline: none;
     transition: all 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Custom select arrow */
+select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
 }
 
 input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--glow); }
@@ -221,3 +236,58 @@ select option { background: var(--card-bg); color: var(--text-main); }
 .status-msg { font-size: 12px; margin-top: 12px; text-align: center; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========================================================
+   MOBILE RESPONSIVENESS
+   ======================================================== */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        align-items: flex-start; /* Allows scrolling if card is taller than screen */
+    }
+
+    .card {
+        padding: 24px 20px;
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .card.hidden {
+        display: none !important; /* On mobile, absolute positioning animations can be glitchy */
+    }
+
+    .dashboard-layout {
+        padding: 20px 16px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr; /* Stack dashboard elements vertically */
+        gap: 16px;
+    }
+
+    .row {
+        flex-direction: column; /* Stack dropdowns vertically on small screens */
+        gap: 0;
+    }
+    
+    .half {
+        width: 100%;
+    }
+
+    h1 { font-size: 20px; }
+    h2 { font-size: 18px; }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .btn-ghost {
+        align-self: flex-end;
+    }
+}
