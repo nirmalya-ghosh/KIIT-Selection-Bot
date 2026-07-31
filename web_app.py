@@ -1,6 +1,8 @@
 import asyncio
 import os
 import uuid
+import time
+import base64
 import webbrowser
 from threading import Thread
 
@@ -10,16 +12,61 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import serialization, hashes
+from starlette.middleware.base import BaseHTTPMiddleware
+
 import kiit_ultra_bot
 
+# --- 1. CRYPTO ENGINE (RAM ONLY) ---
+private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+public_key = private_key.public_key()
+public_pem = public_key.public_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PublicFormat.SubjectPublicKeyInfo
+).decode('utf-8')
+
 app = FastAPI()
+
+# --- 2. CSP AND SECURITY HEADERS ARMOR ---
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+# --- 3. RATE LIMITING (3 STRIKES, 15 MIN BAN) ---
+failed_attempts = {}
+BAN_TIME = 900 # 15 minutes
+
+def is_rate_limited(ip: str) -> bool:
+    now = time.time()
+    if ip in failed_attempts:
+        attempts = [t for t in failed_attempts[ip] if now - t < BAN_TIME]
+        failed_attempts[ip] = attempts
+        if len(attempts) >= 3:
+            return True
+    return False
+
+def record_failure(ip: str):
+    now = time.time()
+    if ip not in failed_attempts:
+        failed_attempts[ip] = []
+    failed_attempts[ip].append(now)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# In-memory session store (maps session_id -> KiitAgent instance)
-# WARNING: This keeps a full Chrome instance open per session!
 active_sessions = {}
+
+@app.get("/api/public-key")
+async def get_public_key():
+    return {"public_key": public_pem}
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -27,31 +74,56 @@ async def read_root(request: Request):
 
 @app.post("/api/login")
 async def login(request: Request):
+    client_ip = request.client.host
+    if is_rate_limited(client_ip):
+        raise HTTPException(status_code=429, detail="Too many failed attempts. You are locked out for 15 minutes.")
+
     data = await request.json()
     email = data.get("email")
-    password = data.get("password")
+    encrypted_password_b64 = data.get("password")
     
-    if not email or not password:
+    if not email or not encrypted_password_b64:
         raise HTTPException(status_code=400, detail="Missing credentials")
         
+    try:
+        # Decrypt password using RAM-only private key
+        encrypted_password = base64.b64decode(encrypted_password_b64)
+        decrypted_password = private_key.decrypt(
+            encrypted_password,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        ).decode('utf-8')
+    except Exception as e:
+        record_failure(client_ip)
+        raise HTTPException(status_code=400, detail="Decryption failed. Security violation.")
+
     session_id = str(uuid.uuid4())
     agent = kiit_ultra_bot.KiitAgent()
     active_sessions[session_id] = agent
     
-    # Run login and scrape synchronously (can take 5-10 seconds)
-    success = agent.login(email, password)
+    # Run login and scrape synchronously
+    success = agent.login(email, decrypted_password)
     
     # SECURITY OVERRIDE: Destroy sensitive data in memory immediately
-    del email
-    del password
+    del decrypted_password
+    del encrypted_password_b64
+    del encrypted_password
     data.clear()
     
     if not success:
         agent.close()
         del active_sessions[session_id]
+        record_failure(client_ip)
         raise HTTPException(status_code=401, detail="Login to SAP failed")
         
     dashboard_data = agent.scrape_dashboard()
+    
+    # Successful login, reset failed attempts
+    if client_ip in failed_attempts:
+        del failed_attempts[client_ip]
     
     return {
         "message": "Login successful",

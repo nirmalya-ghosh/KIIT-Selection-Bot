@@ -1,5 +1,42 @@
 let currentSessionId = null;
 
+// --- CRYPTO ENGINE ---
+function str2ab(str) {
+    const buf = new ArrayBuffer(str.length);
+    const bufView = new Uint8Array(buf);
+    for (let i = 0, strLen = str.length; i < strLen; i++) bufView[i] = str.charCodeAt(i);
+    return buf;
+}
+
+function ab2b64(buf) {
+    let binary = '';
+    const bytes = new Uint8Array(buf);
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+    return window.btoa(binary);
+}
+
+async function getPublicKey() {
+    const res = await fetch('/api/public-key');
+    const data = await res.json();
+    const pemHeader = "-----BEGIN PUBLIC KEY-----";
+    const pemFooter = "-----END PUBLIC KEY-----";
+    const pemContents = data.public_key.substring(pemHeader.length, data.public_key.length - pemFooter.length).replace(/\s/g, '');
+    const binaryDerString = window.atob(pemContents);
+    const binaryDer = str2ab(binaryDerString);
+    
+    return await window.crypto.subtle.importKey(
+        "spki", binaryDer,
+        { name: "RSA-OAEP", hash: "SHA-256" },
+        true, ["encrypt"]
+    );
+}
+
+async function encryptData(publicKey, data) {
+    const encoded = new TextEncoder().encode(data);
+    const ciphertext = await window.crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, encoded);
+    return ab2b64(ciphertext);
+}
+
 // --- LOGIN FLOW ---
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -17,14 +54,18 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
     // UI Loading State
     btn.disabled = true;
-    btnText.textContent = 'Authenticating...';
+    btnText.textContent = 'Encrypting & Authenticating...';
     spinner.classList.remove('hidden');
 
     try {
+        // Encrypt the password client-side
+        const publicKey = await getPublicKey();
+        const encryptedPassword = await encryptData(publicKey, password);
+
         const response = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password: encryptedPassword })
         });
 
         const data = await response.json();

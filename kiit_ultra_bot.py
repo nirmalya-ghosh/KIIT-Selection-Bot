@@ -10,6 +10,8 @@ import json
 import os
 import time
 import random
+import ctypes
+import sys
 from typing import Any, Dict
 
 import undetected_chromedriver as uc
@@ -17,6 +19,26 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+def secure_wipe_string(s: str):
+    """
+    EXTREME SECURITY: Physically overwrites the string in CPython memory with zeros.
+    Warning: This is a highly aggressive operation that manipulates raw RAM bytes.
+    """
+    if not isinstance(s, str): return
+    
+    # Python strings have a header. We calculate the offset to the actual string data buffer.
+    # In CPython 3, sys.getsizeof("") gives the header size.
+    buffer_offset = sys.getsizeof("") - 1
+    
+    # Get the physical memory address of the string object
+    addr = id(s)
+    
+    # Use C's memset to overwrite the raw memory bytes
+    try:
+        ctypes.memset(addr + buffer_offset, 0, len(s.encode('utf-8')))
+    except Exception as e:
+        log(f"Secure wipe warning: {e}")
 
 def timestamp() -> str:
     from datetime import datetime
@@ -80,6 +102,8 @@ class KiitAgent:
                 pass_f.send_keys(Keys.ENTER)
                 
                 # SECURITY OVERRIDE: Destroy credentials in memory immediately after injection
+                secure_wipe_string(password)
+                secure_wipe_string(email)
                 del email
                 del password
             except:
