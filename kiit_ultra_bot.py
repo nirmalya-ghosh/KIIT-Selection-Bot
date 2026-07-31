@@ -90,11 +90,14 @@ class KiitAgent:
             self.driver.get("https://kiitportal.kiituniversity.net/irj/portal/")
             time.sleep(3)
             
+            # Extract roll number from email (SAP usually expects just the ID)
+            sap_username = email.split('@')[0] if '@' in email else email
+            
             # Broaden selectors for SAP login forms
             try:
                 email_f = self.driver.find_element(By.CSS_SELECTOR, "input[id*='logonuid'], input[name*='user'], input[id*='user'], input[type='text'], input[type='email']")
                 email_f.clear()
-                self.human_type(email_f, email)
+                self.human_type(email_f, sap_username)
             except:
                 log("Could not find username field")
                 return False
@@ -106,12 +109,20 @@ class KiitAgent:
                 pass_f.clear()
                 self.human_type(pass_f, password)
                 time.sleep(random.uniform(0.2, 0.5))
-                pass_f.send_keys(Keys.ENTER)
+                
+                # Explicitly click the Log On button if it exists, otherwise fallback to ENTER
+                submit_btns = self.driver.find_elements(By.CSS_SELECTOR, "input[type='submit'], button[type='submit']")
+                if submit_btns:
+                    submit_btns[0].click()
+                else:
+                    pass_f.send_keys(Keys.ENTER)
                 
                 # SECURITY OVERRIDE: Destroy credentials in memory immediately after injection
                 secure_wipe_string(password)
                 secure_wipe_string(email)
+                secure_wipe_string(sap_username)
                 del email
+                del sap_username
                 del password
             except:
                 log("Could not find password field")
