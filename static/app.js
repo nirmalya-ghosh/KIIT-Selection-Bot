@@ -18,9 +18,13 @@ function ab2b64(buf) {
 async function getPublicKey() {
     const res = await fetch('/api/public-key');
     const data = await res.json();
-    const pemHeader = "-----BEGIN PUBLIC KEY-----";
-    const pemFooter = "-----END PUBLIC KEY-----";
-    const pemContents = data.public_key.substring(pemHeader.length, data.public_key.length - pemFooter.length).replace(/\s/g, '');
+    
+    // Safely extract the base64 payload by stripping headers, footers, and all whitespace
+    const pemContents = data.public_key
+        .replace("-----BEGIN PUBLIC KEY-----", "")
+        .replace("-----END PUBLIC KEY-----", "")
+        .replace(/\s/g, "");
+        
     const binaryDerString = window.atob(pemContents);
     const binaryDer = str2ab(binaryDerString);
     
