@@ -1,0 +1,33 @@
+{
+  "credentials": {
+    "base_url": "https://sap.kiit.ac.in",
+    "email": "your_email@kiit.ac.in",
+    "password": "your_password"
+  },
+  "registration": {
+    "semester": "3rd",
+    "sections": ["CSE-01", "CSE-02", "CSE-14"],
+    "headless_mode": true
+  },
+  "advanced": {
+    "swarm_mode": true,
+    "swarm_threads": 3,
+    "use_api_fallback": true,
+    "api_registration_endpoint": "https://sap.kiit.ac.in/api/register_section",
+    "schedule_time": "",
+    "enable_captcha_solver": false,
+    "2captcha_api_key": ""
+  },
+  "stealth": {
+    "use_undetected_chromedriver": true,
+    "proxy_url": "",
+    "randomize_user_agent": true,
+    "human_jitter": true,
+    "session_keepalive_interval_sec": 300
+  },
+  "notifications": {
+    "discord_webhook_url": "",
+    "telegram_bot_token": "",
+    "telegram_chat_id": ""
+  }
+}

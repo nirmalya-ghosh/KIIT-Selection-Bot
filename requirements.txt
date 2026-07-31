@@ -1,0 +1,10 @@
+selenium
+webdriver-manager
+colorama
+requests
+undetected-chromedriver
+fake-useragent
+fastapi
+uvicorn
+jinja2
+python-multipart

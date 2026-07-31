@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIIT Ultra Bot | Vercel Style</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <main class="container">
+        
+        <div class="card" id="input-card">
+            <div class="card-header">
+                <svg class="logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 22H22L12 2Z" fill="white"/>
+                </svg>
+                <h1>KIIT Ultra Bot</h1>
+                <p>Enterprise Registration Engine</p>
+            </div>
+
+            <form id="bot-form">
+                <div class="input-group">
+                    <label>KIIT Email</label>
+                    <input type="email" id="email" placeholder="user@kiit.ac.in" required>
+                </div>
+                
+                <div class="input-group">
+                    <label>SAP Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="row">
+                    <div class="input-group half">
+                        <label>Semester</label>
+                        <select id="semester">
+                            <option value="3rd">3rd Semester</option>
+                            <option value="5th">5th Semester</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group half">
+                        <label>Sections (Comma separated)</label>
+                        <input type="text" id="sections" placeholder="CSE-01, CSE-02" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Initiate Sequence
+                    <span class="arrow">→</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="card hidden" id="process-card">
+            <div class="card-header">
+                <div class="pulse-ring"></div>
+                <h1>Executing Swarm</h1>
+                <p id="status-text">Initializing parameters...</p>
+            </div>
+
+            <div class="terminal" id="terminal">
+                <!-- Logs will stream here -->
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
