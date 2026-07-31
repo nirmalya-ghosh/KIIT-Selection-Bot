@@ -167,7 +167,31 @@ async def debug_html():
         return HTMLResponse("No active sessions")
     agent = list(active_sessions.values())[0]
     if agent.driver:
-        return HTMLResponse(agent.driver.page_source)
+        html = "<html><body>"
+        try:
+            agent.driver.switch_to.default_content()
+            html += f"<h2>Main Page</h2><textarea rows='10' cols='100'>{agent.driver.page_source}</textarea>"
+            iframes = agent.driver.find_elements(By.TAG_NAME, "iframe")
+            for i, frame in enumerate(iframes):
+                try:
+                    f_id = frame.get_attribute('id')
+                    agent.driver.switch_to.frame(frame)
+                    html += f"<h2>Iframe {i} ({f_id})</h2><textarea rows='10' cols='100'>{agent.driver.page_source}</textarea>"
+                    nested = agent.driver.find_elements(By.TAG_NAME, "iframe")
+                    for j, nframe in enumerate(nested):
+                        try:
+                            n_id = nframe.get_attribute('id')
+                            agent.driver.switch_to.frame(nframe)
+                            html += f"<h2>Nested {i}-{j} ({n_id})</h2><textarea rows='10' cols='100'>{agent.driver.page_source}</textarea>"
+                            agent.driver.switch_to.parent_frame()
+                        except: pass
+                    agent.driver.switch_to.default_content()
+                except: 
+                    agent.driver.switch_to.default_content()
+        except Exception as e:
+            html += f"<p>Error: {str(e)}</p>"
+        html += "</body></html>"
+        return HTMLResponse(html)
     return HTMLResponse("No driver")
 
 @app.post("/api/logout")
