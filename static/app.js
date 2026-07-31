@@ -43,36 +43,42 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 // --- POPULATE DASHBOARD ---
 function populateDashboard(data) {
     // Mentor
-    document.getElementById('mentor-name').textContent = data.mentor_details;
+    document.getElementById('mentor-name').textContent = data.mentor_name || "N/A";
+    document.getElementById('mentor-contact').textContent = data.mentor_contact || "N/A";
+    document.getElementById('mentor-email').textContent = data.mentor_email || "N/A";
 
     // Attendance Table
     const tbody = document.getElementById('attendance-body');
     tbody.innerHTML = '';
-    data.attendance.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${item.subject}</td>
-            <td>${item.present}</td>
-            <td><span style="color: ${parseInt(item.percentage) < 75 ? 'var(--error)' : 'var(--success)'}">${item.percentage}</span></td>
-        `;
-        tbody.appendChild(tr);
-    });
+    if (data.attendance && data.attendance.length > 0) {
+        data.attendance.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.total_days || '0'}</td>
+                <td>${item.absent || '0'}</td>
+                <td>${item.present || '0'}</td>
+                <td>${item.subject || 'N/A'}</td>
+                <td><span style="color: ${parseInt(item.percentage) < 75 ? 'var(--error)' : 'var(--success)'}">${item.percentage || '0'}%</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
 
     // Dropdowns
-    const subjectSelect = document.getElementById('subject-select');
-    subjectSelect.innerHTML = '';
-    data.subjects.forEach(sub => {
+    const yearSelect = document.getElementById('year-select');
+    yearSelect.innerHTML = '';
+    (data.years || ["2026-2027"]).forEach(yr => {
         const opt = document.createElement('option');
-        opt.value = sub; opt.textContent = sub;
-        subjectSelect.appendChild(opt);
+        opt.value = yr; opt.textContent = yr;
+        yearSelect.appendChild(opt);
     });
 
-    const sectionSelect = document.getElementById('section-select');
-    sectionSelect.innerHTML = '';
-    data.sections.forEach(sec => {
+    const sessionSelect = document.getElementById('session-select');
+    sessionSelect.innerHTML = '';
+    (data.sessions || ["Autumn", "Spring", "Supplementary Exam"]).forEach(sec => {
         const opt = document.createElement('option');
         opt.value = sec; opt.textContent = sec;
-        sectionSelect.appendChild(opt);
+        sessionSelect.appendChild(opt);
     });
 }
 

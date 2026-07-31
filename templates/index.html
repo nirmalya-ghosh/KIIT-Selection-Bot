@@ -59,10 +59,11 @@
                 
                 <!-- Mentor Details -->
                 <div class="dash-section">
-                    <h3>Mentor Details</h3>
-                    <div class="info-box">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        <span id="mentor-name">Loading...</span>
+                    <h3>Mentor Information</h3>
+                    <div class="info-box" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                        <div><strong style="color: var(--text-muted);">Mentor Name :</strong> <span id="mentor-name">Loading...</span></div>
+                        <div><strong style="color: var(--text-muted);">Contact Number :</strong> <span id="mentor-contact">Loading...</span></div>
+                        <div><strong style="color: var(--text-muted);">E-mail ID :</strong> <span id="mentor-email">Loading...</span></div>
                     </div>
                 </div>
 
@@ -78,14 +79,16 @@
 
             <!-- Attendance Table -->
             <div class="dash-section mt-4">
-                <h3>Attendance Summary</h3>
+                <h3>Attendance Details</h3>
                 <div class="table-container">
                     <table id="attendance-table">
                         <thead>
                             <tr>
+                                <th>Total Days</th>
+                                <th>Absent</th>
+                                <th>Present</th>
                                 <th>Subject</th>
-                                <th>Present/Total</th>
-                                <th>%</th>
+                                <th>Total Percentage</th>
                             </tr>
                         </thead>
                         <tbody id="attendance-body">
@@ -99,25 +102,25 @@
 
             <!-- Selection Section -->
             <div class="dash-section">
-                <h3>Course & Section Selection</h3>
+                <h3>Select Year & Session</h3>
                 <div class="row mt-2">
                     <div class="input-group half">
-                        <label>Select Elective / Subject</label>
-                        <select id="subject-select">
+                        <label>Year:</label>
+                        <select id="year-select">
                             <option>Loading...</option>
                         </select>
                     </div>
                     
                     <div class="input-group half">
-                        <label>Select Section</label>
-                        <select id="section-select">
+                        <label>Session:</label>
+                        <select id="session-select">
                             <option>Loading...</option>
                         </select>
                     </div>
                 </div>
                 
-                <button class="btn-primary w-full" id="submit-selection-btn">
-                    Lock Selection
+                <button class="btn-primary" id="submit-selection-btn" style="width: 120px;">
+                    Submit
                 </button>
                 <p id="selection-status" class="status-msg hidden"></p>
             </div>
