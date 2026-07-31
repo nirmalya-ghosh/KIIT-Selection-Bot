@@ -80,6 +80,22 @@ function populateDashboard(data) {
         opt.value = sec; opt.textContent = sec;
         sessionSelect.appendChild(opt);
     });
+
+    const subjectSelect = document.getElementById('subject-select');
+    subjectSelect.innerHTML = '';
+    (data.subjects || ["Loading..."]).forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub; opt.textContent = sub;
+        subjectSelect.appendChild(opt);
+    });
+
+    const sectionSelect = document.getElementById('section-select');
+    sectionSelect.innerHTML = '';
+    (data.sections || ["Loading..."]).forEach(sec => {
+        const opt = document.createElement('option');
+        opt.value = sec; opt.textContent = sec;
+        sectionSelect.appendChild(opt);
+    });
 }
 
 // --- UI TRANSITION ---

@@ -102,7 +102,7 @@
 
             <!-- Selection Section -->
             <div class="dash-section">
-                <h3>Select Year & Session</h3>
+                <h3>Select Registration Details</h3>
                 <div class="row mt-2">
                     <div class="input-group half">
                         <label>Year:</label>
@@ -119,8 +119,24 @@
                     </div>
                 </div>
                 
-                <button class="btn-primary" id="submit-selection-btn" style="width: 120px;">
-                    Submit
+                <div class="row">
+                    <div class="input-group half">
+                        <label>Select Subject / Elective:</label>
+                        <select id="subject-select">
+                            <option>Loading...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group half">
+                        <label>Select Section:</label>
+                        <select id="section-select">
+                            <option>Loading...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn-primary w-full" id="submit-selection-btn">
+                    Lock Selections
                 </button>
                 <p id="selection-status" class="status-msg hidden"></p>
             </div>

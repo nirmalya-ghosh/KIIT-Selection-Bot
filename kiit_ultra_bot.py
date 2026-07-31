@@ -84,7 +84,9 @@ class KiitAgent:
             "mentor_email": "Loading...",
             "attendance": [],
             "years": ["2026-2027", "2025-2026"],
-            "sessions": ["Autumn", "Spring", "Supplementary Exam", "Supplementary Exam 1", "Supplementary Exam 2", "Special Exam 1", "Special Exam 2", "Internship Exam", "Year"]
+            "sessions": ["Autumn", "Spring", "Supplementary Exam", "Supplementary Exam 1", "Supplementary Exam 2", "Special Exam 1", "Special Exam 2", "Internship Exam", "Year"],
+            "subjects": ["Machine Learning (Elective)", "Cloud Computing (Elective)", "Data Mining"],
+            "sections": ["CSE-01", "CSE-02", "CSE-03", "IT-01"]
         }
         
         if not self.driver: return data
