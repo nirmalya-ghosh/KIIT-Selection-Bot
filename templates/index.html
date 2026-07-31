@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIIT Ultra Bot | Vercel Style</title>
+    <title>KIIT Selection Bot</title>
     
     <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,18 +15,21 @@
 
     <main class="container">
         
-        <div class="card" id="input-card">
+        <!-- LOGIN CARD -->
+        <div class="card" id="login-card">
             <div class="card-header">
-                <svg class="logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 22H22L12 2Z" fill="white"/>
-                </svg>
-                <h1>KIIT Ultra Bot</h1>
-                <p>Enterprise Registration Engine</p>
+                <div class="logo-circle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 22h20L12 2z"></path>
+                    </svg>
+                </div>
+                <h1>KIIT Selection Bot</h1>
+                <p>SAP Portal Proxy</p>
             </div>
 
-            <form id="bot-form">
+            <form id="login-form">
                 <div class="input-group">
-                    <label>KIIT Email</label>
+                    <label>KIIT Email ID</label>
                     <input type="email" id="email" placeholder="user@kiit.ac.in" required>
                 </div>
                 
@@ -35,42 +38,90 @@
                     <input type="password" id="password" placeholder="••••••••" required>
                 </div>
 
-                <div class="row">
-                    <div class="input-group half">
-                        <label>Semester</label>
-                        <select id="semester">
-                            <option value="3rd">3rd Semester</option>
-                            <option value="5th">5th Semester</option>
-                        </select>
-                    </div>
-                    
-                    <div class="input-group half">
-                        <label>Sections (Comma separated)</label>
-                        <input type="text" id="sections" placeholder="CSE-01, CSE-02" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary">
-                    Initiate Sequence
-                    <span class="arrow">→</span>
+                <button type="submit" class="btn-primary" id="login-btn">
+                    <span class="btn-text">Connect to SAP</span>
+                    <span class="spinner hidden"></span>
                 </button>
             </form>
         </div>
 
-        <div class="card hidden" id="process-card">
-            <div class="card-header">
-                <div class="pulse-ring"></div>
-                <h1>Executing Swarm</h1>
-                <p id="status-text">Initializing parameters...</p>
+        <!-- DASHBOARD CARD -->
+        <div class="card hidden dashboard-layout" id="dashboard-card">
+            <div class="dashboard-header">
+                <div class="header-left">
+                    <h2>Student Dashboard</h2>
+                    <p class="status-badge">Connected</p>
+                </div>
+                <button class="btn-ghost" id="logout-btn">Logout</button>
             </div>
 
-            <div class="terminal" id="terminal">
-                <!-- Logs will stream here -->
+            <div class="dashboard-grid">
+                
+                <!-- Mentor Details -->
+                <div class="dash-section">
+                    <h3>Mentor Details</h3>
+                    <div class="info-box">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span id="mentor-name">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Agentic Actions -->
+                <div class="dash-section">
+                    <h3>Documents</h3>
+                    <button class="btn-secondary w-full" id="download-demand-btn">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download Demand Letter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Attendance Table -->
+            <div class="dash-section mt-4">
+                <h3>Attendance Summary</h3>
+                <div class="table-container">
+                    <table id="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Present/Total</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-body">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Selection Section -->
+            <div class="dash-section">
+                <h3>Course & Section Selection</h3>
+                <div class="row mt-2">
+                    <div class="input-group half">
+                        <label>Select Elective / Subject</label>
+                        <select id="subject-select">
+                            <option>Loading...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group half">
+                        <label>Select Section</label>
+                        <select id="section-select">
+                            <option>Loading...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn-primary w-full" id="submit-selection-btn">
+                    Lock Selection
+                </button>
+                <p id="selection-status" class="status-msg hidden"></p>
             </div>
             
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
         </div>
 
     </main>
