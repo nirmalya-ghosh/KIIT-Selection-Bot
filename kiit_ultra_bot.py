@@ -38,6 +38,11 @@ class KiitAgent:
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
+        
+        # STEALTH MODE: Mask the browser so KIIT SAP doesn't detect it as a bot
+        options.add_argument('--disable-blink-features=AutomationControlled')
+        options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+        
         # Configure download directory for headless chrome
         prefs = {
             "download.default_directory": self.download_dir,
