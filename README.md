@@ -1,31 +1,40 @@
 <div align="center">
 
-# 🤖 KIIT Ultra Auto-Registration Bot v5.0
+# 🤖 KIIT Ultra Auto-Registration Bot v5.0 (Web Edition)
 
 **Fully Automated Semester and Section Selection for KIIT SAP Portal**
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.103.0-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
 [![Selenium](https://img.shields.io/badge/Selenium-WebDriver-green.svg)](https://www.selenium.dev/)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)]()
+[![Platform](https://img.shields.io/badge/platform-Cloud%20Ready-lightgrey.svg)]()
+[![Security](https://img.shields.io/badge/Security-RSA--2048%20%7C%20TLS-red.svg)]()
 
-This bot is designed to automate the process of semester and section selection on the KIIT SAP Portal. It streamlines the registration process by programmatically interacting with the portal, reducing the need for manual intervention during critical registration periods.
+This bot is designed to automate the process of semester and section selection on the KIIT SAP Portal. Version 5.0 introduces a fully responsive web dashboard, military-grade client-side encryption, and humanized behavioral stealth mechanisms.
 
 </div>
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- **🚀 Automated Login:** Logs into the KIIT SAP Portal using provided credentials.
+- **🌐 Interactive Web Dashboard:** A sleek, dark-mode web interface replacing the old terminal prompts.
+- **🚀 Automated Login:** Logs into the KIIT SAP Portal using provided credentials securely.
 - **🎯 Section Selection Navigation:** Automatically navigates to the section selection page.
-- **📅 Semester Selection:** Clicks the designated semester button (e.g., "3rd Semester" or "5th Semester").
-- **✅ Desired Section Selection:** Selects your preferred section from available options (e.g., CSE-01, CSE-14).
-- **⚡ Auto-Submission:** Automatically clicks "ADD" and "SUBMIT" buttons to finalize registration.
-- **🔍 Robust Element Finding:** Employs multiple strategies to find web elements, enhancing reliability.
-- **👻 Headless Mode:** Supports running the browser in headless mode for faster execution and reduced resource consumption.
-- **🏎️ Performance Focused:** Optimized for speed to gain an advantage during high-demand registration times.
-- **🛡️ Error Handling:** Includes retry mechanisms for login and comprehensive error logging.
+- **📅 Smart Selections:** Clicks the designated year, session, subject, and section dropdowns effortlessly.
+- **⚡ Auto-Submission:** Automatically clicks "ADD" and "SUBMIT" buttons to finalize registration in milliseconds.
+- **🛡️ Extreme Security (RSA-2048):** Your password is encrypted inside your browser using an RSA Public Key before transmission. The backend actively memory-wipes the credentials immediately after injection.
+- **👻 Stealth & Humanization:** Employs advanced human-like typing simulation (randomized millisecond delays) and headless browser user-agent masking to remain completely undetectable to SAP behavioral monitoring.
+- **☁️ Cloud Ready:** Pre-configured for seamless deployment on platforms like Render using Docker.
+
+---
+
+## 🔒 Security Architecture
+
+The KIIT Ultra Bot v5.0 implements a zero-trust credential handling architecture:
+1. **Client-Side Encryption:** When you hit "Connect", the JavaScript fetches an RSA-2048 Public Key from the server and encrypts your password *before* it leaves your computer.
+2. **Memory Annihilation:** The Python backend receives the encrypted string, decrypts it in memory, uses it via Selenium, and immediately executes `secure_wipe_string()` followed by python's garbage collector `del` to permanently scrub the data from RAM.
+3. **Session Tokens:** No passwords are saved in cookies. The dashboard uses randomized UUIDv4 session identifiers for subsequent interactions (like downloading demand letters).
 
 ---
 
@@ -42,79 +51,36 @@ This bot is designed to automate the process of semester and section selection o
 
 ---
 
-## 🛠️ Prerequisites
-
-Before running the bot, ensure you have the following installed:
-
-- **Python 3.8 or higher:** [Download Python](https://www.python.org/downloads/)
-- **pip:** Python's package installer (usually comes with Python).
-- **Chrome Browser:** The bot uses `selenium` to control Chrome. Ensure you have Google Chrome installed on your system.
-
----
-
-## 🚀 Installation
+## 🚀 Installation & Usage
 
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/nirmalya-ghosh/KIIT-Selection-Bot.git
    cd KIIT-Selection-Bot
    ```
-   *(If you downloaded the files directly, navigate to the directory containing `kiit_ultra_bot.py`.)*
 
 2. **Install required Python packages:**
    ```bash
    pip install -r requirements.txt
    ```
-   *(Note: You might need to create a `requirements.txt` file first if not provided. See below.)*
 
-### Creating `requirements.txt` (if not provided)
-If you don't have a `requirements.txt` file, create one in the same directory as `kiit_ultra_bot.py` with the following content:
-```text
-selenium
-webdriver-manager
-colorama
-```
-Then run `pip install -r requirements.txt`.
+3. **Start the Web Server:**
+   ```bash
+   uvicorn web_app:app --host 0.0.0.0 --port 8000
+   ```
+   
+4. **Access the Dashboard:**
+   Open your web browser and navigate to `http://localhost:8000`.
 
 ---
 
-## 💻 Usage
+## ☁️ Cloud Deployment (Render)
 
-1. **Open a terminal or command prompt** and navigate to the bot's directory.
-2. **Run the bot:**
-   - **On Windows:**
-     Double-click the `run_kiit_ultra_bot.bat` file or run from the command prompt:
-     ```cmd
-     run_kiit_ultra_bot.bat
-     ```
-     Alternatively, run directly with Python:
-     ```bash
-     python kiit_ultra_bot.py
-     ```
-   - **On macOS/Linux:**
-     ```bash
-     python3 kiit_ultra_bot.py
-     ```
-
-3. **Follow the prompts:** The bot will ask for the following information:
-   - **SAP Portal Base URL:** (e.g., `https://sap.kiit.ac.in`)
-   - **KIIT Email:** Your KIIT email ID.
-   - **SAP Password:** Your SAP portal password (input will be hidden for security).
-   - **Desired Section:** The section you wish to register for (e.g., `CSE-01`).
-   - **Semester:** The semester you are registering for (`3rd` or `5th`).
-   - **Run in headless mode? (faster) [y/N]:** Type `y` for headless mode (no browser UI) or `n` to see the browser actions.
-
-4. **Monitor the console output:** The bot will log its actions and indicate whether the registration was successful or failed.
-
----
-
-## 📚 Available Sections
-
-The bot is configured to handle sections typically named in the format `CSE-XX`. Currently supported/expected sections include:
-- `CSE-01`, `CSE-02`, `CSE-03`, `CSE-04`, `CSE-05`, `CSE-06`, `CSE-07`
-- `CSE-08`, `CSE-09`, `CSE-10`, `CSE-11`, `CSE-12`, `CSE-13`, `CSE-14`
-
-*Ensure you enter the section exactly as it appears (e.g., `CSE-01`).*
+This bot is fully configured for cloud deployment. To deploy on Render:
+1. Connect your GitHub repository to Render as a "Web Service".
+2. Select **Docker** as the Runtime environment.
+3. Render will automatically read the `Dockerfile` and build the lightweight container with headless Chrome and Python.
+4. Access your live proxy dashboard from anywhere in the world.
 
 ---
 
@@ -122,11 +88,9 @@ The bot is configured to handle sections typically named in the format `CSE-XX`.
 
 | Issue | Solution |
 | :--- | :--- |
-| **Bot fails to find elements** | The KIIT SAP portal's structure might have changed. You may need to update the bot's code to reflect new element IDs, names, or XPATHs. |
-| **`WebDriverException` or Chrome-related errors** | Ensure your Chrome browser is up to date. `webdriver-manager` should handle the ChromeDriver version automatically, but sometimes manual intervention might be needed. |
-| **Login failures** | Double-check your KIIT email and password. |
-| **"Could not determine registration status"** | The bot might have completed the process, but the verification logic couldn't confirm it. Manually check your SAP portal to confirm. |
-| **Bot stops responding** | The website might be slow, or a network issue might have occurred. Restart the bot. |
+| **"Login to SAP failed" alert** | Ensure your KIIT Email/Roll Number and Password are correct. The bot strips the domain to pass the raw Roll Number to SAP NetWeaver. |
+| **"Server connection failed" alert** | Usually means the backend server crashed or is unavailable. Check the Render deployment logs or your terminal. |
+| **Bot fails to find elements** | The KIIT SAP portal's structure might have changed. You may need to update the XPath or CSS selectors in `kiit_ultra_bot.py`. |
 
 ---
 
