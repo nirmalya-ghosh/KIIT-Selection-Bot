@@ -77,6 +77,12 @@ class KiitAgent:
         self.driver = uc.Chrome(options=options)
         self.driver.set_page_load_timeout(30)
 
+    def human_type(self, element, text: str):
+        """Types text character by character with random human-like delays."""
+        for char in text:
+            element.send_keys(char)
+            time.sleep(random.uniform(0.05, 0.2)) # Random delay between 50ms and 200ms
+
     def login(self, email: str, password: str) -> bool:
         self.start_browser()
         log("Navigating to SAP portal...")
@@ -88,17 +94,18 @@ class KiitAgent:
             try:
                 email_f = self.driver.find_element(By.CSS_SELECTOR, "input[id*='logonuid'], input[name*='user'], input[id*='user'], input[type='text'], input[type='email']")
                 email_f.clear()
-                email_f.send_keys(email)
+                self.human_type(email_f, email)
             except:
                 log("Could not find username field")
                 return False
                 
-            time.sleep(0.5)
+            time.sleep(random.uniform(0.5, 1.2)) # Human pause before typing password
             
             try:
                 pass_f = self.driver.find_element(By.CSS_SELECTOR, "input[id*='logonpass'], input[type='password']")
                 pass_f.clear()
-                pass_f.send_keys(password)
+                self.human_type(pass_f, password)
+                time.sleep(random.uniform(0.2, 0.5))
                 pass_f.send_keys(Keys.ENTER)
                 
                 # SECURITY OVERRIDE: Destroy credentials in memory immediately after injection
