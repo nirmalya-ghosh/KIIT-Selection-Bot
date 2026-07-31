@@ -81,12 +81,12 @@ class KiitAgent:
         self.start_browser()
         log("Navigating to SAP portal...")
         try:
-            self.driver.get("https://sap.kiit.ac.in")
+            self.driver.get("https://kiitportal.kiituniversity.net/irj/portal/")
             time.sleep(3)
             
             # Broaden selectors for SAP login forms
             try:
-                email_f = self.driver.find_element(By.CSS_SELECTOR, "input[type='email'], input[name*='user'], input[id*='user'], input[type='text']")
+                email_f = self.driver.find_element(By.CSS_SELECTOR, "input[id*='logonuid'], input[name*='user'], input[id*='user'], input[type='text'], input[type='email']")
                 email_f.clear()
                 email_f.send_keys(email)
             except:
@@ -96,7 +96,7 @@ class KiitAgent:
             time.sleep(0.5)
             
             try:
-                pass_f = self.driver.find_element(By.CSS_SELECTOR, "input[type='password']")
+                pass_f = self.driver.find_element(By.CSS_SELECTOR, "input[id*='logonpass'], input[type='password']")
                 pass_f.clear()
                 pass_f.send_keys(password)
                 pass_f.send_keys(Keys.ENTER)
