@@ -77,7 +77,9 @@ async def stream():
 
 
 def open_browser():
-    webbrowser.open("http://127.0.0.1:8000")
+    import os
+    if not os.environ.get("RENDER"):
+        webbrowser.open("http://127.0.0.1:8000")
 
 if __name__ == "__main__":
     # Open the browser shortly after starting
