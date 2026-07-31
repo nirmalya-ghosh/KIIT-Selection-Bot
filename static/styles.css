@@ -23,9 +23,9 @@ body {
     color: var(--text-main);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Changed from center to prevent top cutoff */
     min-height: 100vh;
-    padding: 20px;
+    padding: 40px 20px; /* Added top padding */
 }
 
 .container {

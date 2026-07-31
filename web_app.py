@@ -160,6 +160,16 @@ async def download_demand_letter(session_id: str):
     else:
         raise HTTPException(status_code=500, detail="Failed to download demand letter")
 
+@app.get("/api/debug_html")
+async def debug_html():
+    # TEMPORARY ENDPOINT: Dumps HTML of the active session so we can calibrate the scraper
+    if not active_sessions:
+        return HTMLResponse("No active sessions")
+    agent = list(active_sessions.values())[0]
+    if agent.driver:
+        return HTMLResponse(agent.driver.page_source)
+    return HTMLResponse("No driver")
+
 @app.post("/api/logout")
 async def logout(request: Request):
     data = await request.json()
