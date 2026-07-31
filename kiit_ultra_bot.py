@@ -35,6 +35,9 @@ class KiitAgent:
         if self.driver: return
         options = uc.ChromeOptions()
         options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
         # Configure download directory for headless chrome
         prefs = {
             "download.default_directory": self.download_dir,
@@ -52,27 +55,39 @@ class KiitAgent:
         log("Navigating to SAP portal...")
         try:
             self.driver.get("https://sap.kiit.ac.in")
-            time.sleep(2)
+            time.sleep(3)
             
-            # Blindly attempt to find email and password fields
-            email_f = self.driver.find_element(By.CSS_SELECTOR, "input[type='email'], input[name*='user'], input[name*='email']")
-            email_f.send_keys(email)
+            # Broaden selectors for SAP login forms
+            try:
+                email_f = self.driver.find_element(By.CSS_SELECTOR, "input[type='email'], input[name*='user'], input[id*='user'], input[type='text']")
+                email_f.clear()
+                email_f.send_keys(email)
+            except:
+                log("Could not find username field")
+                return False
+                
             time.sleep(0.5)
             
-            pass_f = self.driver.find_element(By.CSS_SELECTOR, "input[type='password']")
-            pass_f.send_keys(password)
-            time.sleep(0.5)
+            try:
+                pass_f = self.driver.find_element(By.CSS_SELECTOR, "input[type='password']")
+                pass_f.clear()
+                pass_f.send_keys(password)
+                pass_f.send_keys(Keys.ENTER)
+            except:
+                log("Could not find password field")
+                return False
+                
+            time.sleep(5) # Wait for dashboard to load (Render can be slow)
             
-            pass_f.send_keys(Keys.ENTER)
-            time.sleep(4) # Wait for dashboard to load
-            
-            # Check if login was successful by looking for a logout button or dashboard indicator
-            if "login" not in self.driver.current_url.lower():
+            # Check if login was successful (either URL changed or we find dashboard elements)
+            if "login" not in self.driver.current_url.lower() or len(self.driver.find_elements(By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'dashboard') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'logout')]")) > 0:
                 log("Login successful.")
                 return True
+                
+            log(f"Login check failed. Current URL: {self.driver.current_url}")
             return False
         except Exception as e:
-            log(f"Login failed: {e}")
+            log(f"Login exception: {e}")
             return False
 
     def scrape_dashboard(self) -> Dict[str, Any]:
