@@ -145,6 +145,31 @@ class KiitAgent:
             log(f"Login exception: {e}")
             return False
 
+    def _switch_to_frame_with_element(self, xpath: str) -> bool:
+        """Recursively searches all iframes to find the target element."""
+        self.driver.switch_to.default_content()
+        if len(self.driver.find_elements(By.XPATH, xpath)) > 0:
+            return True
+            
+        iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
+        for i, frame in enumerate(iframes):
+            try:
+                self.driver.switch_to.frame(frame)
+                if len(self.driver.find_elements(By.XPATH, xpath)) > 0:
+                    return True
+                nested = self.driver.find_elements(By.TAG_NAME, "iframe")
+                for j, nframe in enumerate(nested):
+                    try:
+                        self.driver.switch_to.frame(nframe)
+                        if len(self.driver.find_elements(By.XPATH, xpath)) > 0:
+                            return True
+                        self.driver.switch_to.parent_frame()
+                    except: pass
+                self.driver.switch_to.default_content()
+            except: 
+                self.driver.switch_to.default_content()
+        return False
+
     def scrape_dashboard(self) -> Dict[str, Any]:
         """Scrapes Mentor, Attendance, Subjects, and Sections using best-guess selectors."""
         log("Scraping dashboard data...")
@@ -162,20 +187,35 @@ class KiitAgent:
         if not self.driver: return data
         
         try:
-            # 1. Scrape Mentor Info
+            # 0. Navigate to Self Service
             try:
-                name_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Mentor Name :')]")
-                data["mentor_name"] = name_el.text.replace("Mentor Name :", "").strip()
+                # SAP top nav is usually in the top level or a main iframe
+                xpath = "//a[contains(text(), 'Student Self Service')]"
+                if self._switch_to_frame_with_element(xpath):
+                    self.driver.find_element(By.XPATH, xpath).click()
+                    time.sleep(3) # Wait for inner page to load
+            except: pass
+
+            # 1. Scrape Mentor Info (Needs to find the content iframe first)
+            try:
+                xpath = "//*[contains(text(), 'Mentor Name')]"
+                if self._switch_to_frame_with_element(xpath):
+                    name_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Mentor Name')]")
+                    # Usually it's in the next td or sibling
+                    parent = name_el.find_element(By.XPATH, "..")
+                    data["mentor_name"] = parent.text.replace("Mentor Name :", "").replace("Mentor Name", "").strip()
             except: pass
             
             try:
-                contact_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Contact Number :')]")
-                data["mentor_contact"] = contact_el.text.replace("Contact Number :", "").strip()
+                contact_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Contact')]")
+                parent = contact_el.find_element(By.XPATH, "..")
+                data["mentor_contact"] = parent.text.replace("Contact Number :", "").replace("Contact", "").strip()
             except: pass
             
             try:
-                email_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'E-mail ID :')]")
-                data["mentor_email"] = email_el.text.replace("E-mail ID :", "").strip()
+                email_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'E-mail')]")
+                parent = email_el.find_element(By.XPATH, "..")
+                data["mentor_email"] = parent.text.replace("E-mail ID :", "").replace("E-mail", "").strip()
             except: pass
 
             # 2. Scrape Attendance Table
