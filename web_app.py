@@ -41,6 +41,11 @@ async def login(request: Request):
     # Run login and scrape synchronously (can take 5-10 seconds)
     success = agent.login(email, password)
     
+    # SECURITY OVERRIDE: Destroy sensitive data in memory immediately
+    del email
+    del password
+    data.clear()
+    
     if not success:
         agent.close()
         del active_sessions[session_id]

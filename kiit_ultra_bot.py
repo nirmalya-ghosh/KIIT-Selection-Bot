@@ -73,6 +73,10 @@ class KiitAgent:
                 pass_f.clear()
                 pass_f.send_keys(password)
                 pass_f.send_keys(Keys.ENTER)
+                
+                # SECURITY OVERRIDE: Destroy credentials in memory immediately after injection
+                del email
+                del password
             except:
                 log("Could not find password field")
                 return False

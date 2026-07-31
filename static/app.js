@@ -5,7 +5,12 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const passwordInput = document.getElementById('password');
+    const password = passwordInput.value;
+    
+    // SECURITY OVERRIDE: Clear password from DOM instantly
+    passwordInput.value = '';
+
     const btn = document.getElementById('login-btn');
     const btnText = btn.querySelector('.btn-text');
     const spinner = btn.querySelector('.spinner');
