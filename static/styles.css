@@ -42,11 +42,8 @@ body {
     padding: 40px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     width: 100%;
+    margin: 20px auto; /* Allow top/bottom margin for scrollability */
 }
 
 .dashboard-layout {
@@ -55,9 +52,7 @@ body {
 }
 
 .card.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: translate(-50%, -40%) scale(0.95);
+    display: none !important;
 }
 
 .card-header {

@@ -119,13 +119,17 @@ class KiitAgent:
                 
             time.sleep(5) # Wait for dashboard to load (Render can be slow)
             
-            # Check if login was successful (either URL changed or we find dashboard elements)
-            if "login" not in self.driver.current_url.lower() or len(self.driver.find_elements(By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'dashboard') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'logout')]")) > 0:
-                log("Login successful.")
-                return True
+            # Check if login was successful
+            if len(self.driver.find_elements(By.XPATH, "//*[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'authentication failed') or contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'invalid')]")) > 0:
+                log("Authentication failed message detected on page.")
+                return False
                 
-            log(f"Login check failed. Current URL: {self.driver.current_url}")
-            return False
+            if len(self.driver.find_elements(By.CSS_SELECTOR, "input[id*='logonpass'], input[type='password']")) > 0:
+                log("Password field still visible. Login failed.")
+                return False
+                
+            log("Login successful.")
+            return True
         except Exception as e:
             log(f"Login exception: {e}")
             return False
@@ -134,35 +138,34 @@ class KiitAgent:
         """Scrapes Mentor, Attendance, Subjects, and Sections using best-guess selectors."""
         log("Scraping dashboard data...")
         data = {
-            "mentor_name": "Loading...",
-            "mentor_contact": "Loading...",
-            "mentor_email": "Loading...",
+            "mentor_name": "Not Found",
+            "mentor_contact": "Not Found",
+            "mentor_email": "Not Found",
             "attendance": [],
             "years": ["2026-2027", "2025-2026"],
-            "sessions": ["Autumn", "Spring", "Supplementary Exam", "Supplementary Exam 1", "Supplementary Exam 2", "Special Exam 1", "Special Exam 2", "Internship Exam", "Year"],
-            "subjects": ["Machine Learning (Elective)", "Cloud Computing (Elective)", "Data Mining"],
-            "sections": ["CSE-01", "CSE-02", "CSE-03", "IT-01"]
+            "sessions": ["Autumn", "Spring", "Supplementary Exam"],
+            "subjects": ["Subject 1 (Auto-Detected)", "Subject 2 (Auto-Detected)"],
+            "sections": ["Section 1", "Section 2"]
         }
         
         if not self.driver: return data
         
         try:
-            # 1. Scrape Mentor Info (Based on screenshot structure)
+            # 1. Scrape Mentor Info
             try:
-                # Look for 'Mentor Name :' text
                 name_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Mentor Name :')]")
                 data["mentor_name"] = name_el.text.replace("Mentor Name :", "").strip()
-            except: data["mentor_name"] = "Satyabrata Sahoo (Mock)"
+            except: pass
             
             try:
                 contact_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'Contact Number :')]")
                 data["mentor_contact"] = contact_el.text.replace("Contact Number :", "").strip()
-            except: data["mentor_contact"] = "9937060910 (Mock)"
+            except: pass
             
             try:
                 email_el = self.driver.find_element(By.XPATH, "//*[contains(text(), 'E-mail ID :')]")
                 data["mentor_email"] = email_el.text.replace("E-mail ID :", "").strip()
-            except: data["mentor_email"] = "satyabrata.sahoofel@kiit.ac.in (Mock)"
+            except: pass
 
             # 2. Scrape Attendance Table
             try:
@@ -180,15 +183,6 @@ class KiitAgent:
                         })
             except: pass
             
-            # Fallback mock attendance matching screenshot
-            if not data["attendance"]:
-                data["attendance"] = [
-                    {"total_days": "4.00", "absent": "1.00", "present": "3.00", "subject": "Scientific and Technical Writing", "percentage": "75.00"},
-                    {"total_days": "9.00", "absent": "1.00", "present": "8.00", "subject": "Probability and Statistics", "percentage": "88.89"},
-                    {"total_days": "4.00", "absent": "0.00", "present": "4.00", "subject": "Industry 4.0 Technologies", "percentage": "100.00"},
-                    {"total_days": "8.00", "absent": "1.00", "present": "7.00", "subject": "Data Structures", "percentage": "87.50"}
-                ]
-
         except Exception as e:
             log(f"Scraping error: {e}")
             
